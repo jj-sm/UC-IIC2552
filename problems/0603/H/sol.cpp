@@ -1,7 +1,5 @@
-#include <ios>
 #include <iostream>
-#include <vector>
-#include <cmath>
+#include <deque>
 
 using namespace std;
 
@@ -11,64 +9,46 @@ using namespace std;
  */
 
 
-int digits(int n) {
-    if (n == 0) {
-        return 1;
+long long deque2Int(const deque<int> & d) {
+    int result = 0;
+    for (int digit : d) {
+        result = (result * 10) + digit;
     }
-    double abs_n = abs(static_cast<double>(n));
-    return static_cast<int>(floor(log10(abs_n)) + 1);
-}
-
-int suma_rara(int a, int b) {
-    vector<int> residuo(15, 0);
-    vector<int> resultado(15, 0);
-
-    vector<int> a_vec(15, 0);
-    vector<int> b_vec(15, 0);
-
-    for (int i = 0; i < 15; ++i) {
-        a_vec[i] = a % 10;
-        b_vec[i] = b % 10;
-        
-        a /= 10;
-        b /= 10;
-
-        int sum = a_vec[i] + b_vec[i] + residuo[i];
-        
-        resultado[i] = sum % 10;
-        
-        if (i + 2 < 15) {
-            residuo[i + 2] += sum / 10;
-        }
-    }
-
-    int res_final = 0;
-    long long multiplier = 1; 
-    
-    for (int i = 0; i < 15; ++i) {
-        res_final += resultado[i] * multiplier;
-        multiplier *= 10;
-    }
-
-    return res_final;
+    return result;
 }
 
 
 void solve() {
-    int num;
+    string num;
     cin >> num;
 
-    int comb = 0;
+    int n_digits = num.size();
+    int n_digits_half = n_digits / 2;
 
-    for (int a = 1; a <= num; ++a) {
-        for (int b = 1; b <= num; ++b) {
-            if (suma_rara(a, b) == num) {
-                comb++;
-            }
+    deque<int> res_even_deq;
+    deque<int> res_odd_deq;
+
+    for (int i = 1; i < n_digits + 1; i++) {
+        char c = num[n_digits - i];
+        int idx = i - 1;
+
+        if (idx % 2 == 0) {
+            res_even_deq.push_front(c - '0');
+        } else {
+            res_odd_deq.push_front(c - '0');
         }
     }
 
-    cout << comb << "\n";
+    long long int_odd = deque2Int(res_odd_deq);
+    long long int_even = deque2Int(res_even_deq);
+
+    long long ans = (int_odd + 1) * (int_even + 1) - 2;
+
+    // cout << "->" << num << "\n";
+    //
+    // cout << int_odd << " y " << int_even << "\n";
+
+    cout << ans << "\n";
 }
 
 
