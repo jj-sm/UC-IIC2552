@@ -1,22 +1,23 @@
-cmake_minimum_required(VERSION 3.28)
-project(CP_Workspace CXX)
-
+cmake_minimum_required(VERSION 3.23)
+project(UC_IIC2552 CXX)
 set(CMAKE_CXX_STANDARD 23)
 
-# 1. Add a specific "Sanitize" configuration for crdb behavior
-set(SANITIZE_FLAGS "-fsanitize=address,undefined -fno-omit-frame-pointer")
-
-# 2. Add your executable (you can automate this with plugins later)
-add_executable(solution main.cpp)
-
-# 3. Apply Sanitizers only in Debug mode
-target_compile_options(solution PRIVATE
-    $<$<CONFIG:Debug>:${SANITIZE_FLAGS} -g>
-    $<$<CONFIG:Release>:-O2>
+set(ACTIVE_DIRS
+    "problems/0410"
 )
-target_link_options(solution PRIVATE
-    $<$<CONFIG:Debug>:${SANITIZE_FLAGS}>
-)
-add_executable(C_Grafo_Revolucionario "problems/1004/A/C_Grafo_Revolucionario.cpp" "Codeforces - BFS/C_Grafo_Revolucionario.cpp")
-add_executable(solcpp "problems/1004/A/solcpp.cpp")
-add_executable(sol "problems/0410/A/sol.cpp")
+
+foreach(DIR ${ACTIVE_DIRS})
+    file(GLOB_RECURSE CURRENT_CPPS "${DIR}/*.cpp")
+    foreach(FILE ${CURRENT_CPPS})
+        string(REPLACE "/" "_" EXEC_NAME ${FILE})
+        add_executable(${EXEC_NAME} ${FILE})
+    endforeach()
+endforeach()
+add_executable(sol "problems/0417/B/sol.cpp" "problems/0417/A/sol.cpp" "problems/0410/C/sol.cpp" "problems/0410/B/sol.cpp" "problems/0410/A/sol.cpp")
+
+add_executable(B_Sushi_para_Dos "contests/I1/B/B_Sushi_para_Dos.py" "contests/I1/B/B_Sushi_para_Dos.cpp")
+add_executable(G_Conecta_Nlogonia "contests/I1/G/G_Conecta_Nlogonia.cpp")
+add_executable(sol_g "contests/I1/G/sol_g.cpp")
+add_executable(A_Hello_Fortnite "problems/0515/A_Hello_Fortnite.cpp")
+add_executable(B_Distraccin "problems/0515/B_Distraccin.cpp")
+add_executable(C_Pijama "problems/0515/C_Pijama.cpp")

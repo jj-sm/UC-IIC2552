@@ -26,47 +26,45 @@ using vll = vector<ll>;
 #define fi first
 #define se second
 
+vector<vi> adj;
+bool posible = true;
 
-vector<vector<int>> adj;
-vector<int> subtree_size;
-int depth;
+void dfs(int nodo) {
+    if (adj[nodo].empty()) return;
 
-int dfs(int nodo, int padre){
-    int size = 1;
+    int hojas_hijas = 0;
     for (auto u : adj[nodo]) {
-        if (u != padre){
-            size += dfs(u, nodo);
+        dfs(u);
+        if (adj[u].empty()) {
+            hojas_hijas++;
         }
     }
-    return subtree_size[nodo] = size;
+    if (hojas_hijas < 3) {
+        posible = false;
+    }
 }
 
 void solve() {
-    int personas;
-    cin >> personas;
+    int n;
+    if (!(cin >> n)) return;
 
-    adj.resize(personas + 1);
-    subtree_size.resize(personas + 1, 0);
+    adj.assign(n + 1, vi());
+    posible = true;
 
-    for (int i = 0; i < personas - 1; i++) {
-        int u, v;
-        cin >> u >> v;
-        adj[u].pb(v);
-        adj[v].pb(u);
+    for (int i = 2; i <= n; i++) {
+        int p;
+        cin >> p;
+        adj[p].pb(i);
     }
+    dfs(1);
 
-    dfs(1, -1);
-
-    for (int i = 1; i < personas + 1; i++) {
-        cout << subtree_size[i] << " ";
-    }
+    if (posible) cout << "Yes" << endl;
+    else cout << "No" << endl;
 }
 
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int t = 1;
-    cin >> t;
-    while(t--) solve();
+    solve();
     return 0;
 }

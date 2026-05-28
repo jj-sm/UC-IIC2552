@@ -59,3 +59,8 @@ int main(){
 Uno de sus usos es en árboles.
 
 DFS se puede hacer con y sin recursión.
+
+
+### En árboles
+
+> Completar
