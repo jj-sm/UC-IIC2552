@@ -1,16 +1,16 @@
-//  C. Pijama
+//  D. Café Estético
 /**
- * Problem: C_Pijama.cpp
- * Date:    28/05/26
- * Compile: g++ -std=c++23 -O2 A_Hello_Fortnite.cpp -o out
+ * Problem: D_Caf_Esttico.cpp
+ * Date:    29/05/26
+ * Compile: g++ -std=c++23 -O2 D_Caf_Esttico.cpp -o out
  * Run:     ./out < input.txt
  */
+
 #pragma GCC optimize("Ofast")
 #include <iostream>
 #include <vector>
 #include <algorithm>
 #include <string>
-#include <sstream>
 #include <map>
 #include <set>
 #include <queue>
@@ -79,65 +79,69 @@ public:
         while (bfs(s, t)) while (ll dl = dfs(s, LLONG_MAX)) ans += dl;
         return ans;
     }
-    int flowToNode(int u, int i) const {
-        if (G[u][i].c > 0 && G[u][i].f > 0)
-            return G[u][i].to;
-        return -1;
-    }
-    void originalSizeStr(int n_tallas, int n_estudiantes, vector<string>& asignacion, string tallas[]) const {
-        for (int i = 0; i < n_tallas; ++i)
-            for (auto& e : G[1 + i])
-                if (e.c > 0 && e.f > 0)
-                    asignacion[e.to - (n_tallas + 1)] = tallas[i];
-    }
 };
 
 void solve(){
-    string tallas[] = {"S", "M", "L", "XL", "XXL", "XXXL"};
-    vi stock_tallas;
-    int n_tallas = 6;
+    int c, p, e;
+    cin >> c >> p >> e;
 
-    for (int i = 0; i < n_tallas; ++i) {
-        int stock_i;
-        cin >> stock_i;
-        stock_tallas.pb(stock_i);
+    vi demandas(c);
+    vi stocks(p);
+    vi tiempos;
+
+    for (int i = 0; i < c; ++i)
+        cin >> demandas[i];
+
+    for (int i = 0; i < p; ++i)
+        cin >> stocks[i];
+
+    vector<tuple<int,int,int>> edges(e);
+
+    for (int i = 0; i < e; ++i) {
+        int cafe, plant, t;
+        cin >> cafe >> plant >> t;
+        cafe--; plant--;
+        edges[i] = {cafe, plant, t};
+        tiempos.pb(t);
     }
 
-    int n_estudiantes;
-    cin >> n_estudiantes;
+    sort(all(tiempos));
+    tiempos.erase(unique(all(tiempos)), tiempos.end());
 
-    const int n = n_estudiantes + n_tallas + 1;
-    Dinic dinic(n + 1);
+    int total_demanda = accumulate(all(demandas), 0);
 
-    for (int i = 0; i < n_tallas; ++i)
-    dinic.addEdge(0, 1 + i, stock_tallas[i]);
+    int S = 0;
+    int T = p + c + 1;
 
-    for (int i = 0; i < n_estudiantes; ++i) {
-        int nodo_est = n_tallas + 1 + i;
-        string line;
-        cin >> line;
 
-        stringstream ss(line);
-        string buffer;
-        while (getline(ss, buffer, ',')) {
-            int idx = find(tallas, tallas + n_tallas, buffer) - tallas;
-            dinic.addEdge(1 + idx, nodo_est, 1);
+    int l = 0;
+    int r = sz(tiempos) - 1;
+    int ans = -1;
+
+    while (l <= r) {
+        int mid = (l + r) / 2;
+        int t_max = tiempos[mid];
+
+        Dinic dinic(T + 1);
+        for (int i = 0; i < p; ++i)
+            dinic.addEdge(S, 1 + i, stocks[i]);
+
+        for (int i = 0; i < c; ++i)
+            dinic.addEdge(p + 1 + i, T, demandas[i]);
+
+        for (auto& [cafe, plant, t]: edges)
+            if (t <= t_max)
+                dinic.addEdge(1 + plant, p + 1 + cafe, 1e9);
+
+        if (dinic.maxFlow(S, T) == total_demanda) {
+            ans = t_max;
+            r = mid - 1;
+        } else {
+            l = mid + 1;
         }
-
-        dinic.addEdge(nodo_est, n, 1);
     }
 
-    ll flujo = dinic.maxFlow(0, n);
-
-    if (flujo == n_estudiantes) {
-        cout << "YES\n";
-        vector<string> asignacion(n_estudiantes);
-        dinic.originalSizeStr(n_tallas, n_estudiantes, asignacion, tallas);
-        for (int j = 0; j < n_estudiantes; ++j)
-            cout << asignacion[j] << "\n";
-    } else {
-        cout << "NO\n";
-    }
+    cout << ans << "\n";
 }
 
 int main(){
@@ -149,7 +153,3 @@ int main(){
         solve();
     }
 }
-
-
-    // sort(all(tiempos));
-    // tiempos.erase(unique(all(tiempos)), tiempos.end());
